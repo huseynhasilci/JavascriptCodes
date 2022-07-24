@@ -1,0 +1,19 @@
+{
+  "name": "npm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "npmFirstVideo.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jquery": "^3.6.0",
+    "underscore": "^1.13.4"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "webpack": "^5.73.0"
+  }
+}
