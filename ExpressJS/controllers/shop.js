@@ -19,6 +19,16 @@ exports.getProducts = (req, res, next) => {
     });
 }
 
+exports.getProduct = (req, res, next) => {
+    const productId = req.params.productid;
+    const product = Product.getById(productId);
+    res.render('shop/product-detail',{
+        title: product.name,
+        product: product,
+        path: '/products'
+    });
+    //res.redirect('/');
+}
 
 exports.getProductDetails = (req, res, next) => {
     res.render('shop/details', {
