@@ -4,7 +4,7 @@ const app = express();
 
 const bodyParser = require('body-parser');
 
-const adminRoutes = require('./routes/admin');
+const admin = require('./routes/admin');
 const userRoutes = require('./routes/user');
 const path = require('path');
 
@@ -14,7 +14,7 @@ app.set('views', './views');
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(adminRoutes);
+app.use(admin.routes);
 app.use(userRoutes);
 
 //app.set('title','My Site');
@@ -22,7 +22,8 @@ app.use(userRoutes);
 
 app.use((req,res)=>{
     res.status(404);
-    res.sendFile(path.join(__dirname,'views','404.html'));
+    //res.sendFile(path.join(__dirname,'views','404.html'));
+    res.render('404',{title:'Page Not Found'});
 });
 
 /*
