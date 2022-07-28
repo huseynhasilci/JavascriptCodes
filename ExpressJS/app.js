@@ -7,6 +7,8 @@ const path = require('path');
 app.set('view engine', 'pug');
 app.set('views', './views');
 
+const connection = require('./utility/database');
+
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/shop');
 
@@ -18,7 +20,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // routes
 app.use('/admin', adminRoutes);
 app.use(userRoutes);
-
+/*
+connection.execute('SELECT * FROM products')
+    .then((result)=>{
+        console.log(result[0]);
+    }).catch((err)=>{
+        console.log(err);
+    });
+*/
 app.use(errorController.get404Page);
 
 
