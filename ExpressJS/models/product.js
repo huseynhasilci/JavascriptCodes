@@ -3,7 +3,7 @@
 {id:'13215',name:'Samsung seks 9',price:'3500',imageUrl:'3.jpg',description:'iyi iyi',categoryid:"1"},
 {id:'13216',name:'Dizüstü Pc',price:'6200',imageUrl:'3.jpg',description:'iyi iyi',categoryid:"2"},
 {id:'13217',name:'Buzdolabi',price:'7500',imageUrl:'3.jpg',description:'Kotu buzdolabi',categoryid:"3"}];*/
-const connection = require('../utility/database');
+/* const connection = require('../utility/database');
 module.exports = class Product {
 
     constructor(name, price, imageUrl, description,categoryid) {
@@ -56,3 +56,32 @@ module.exports = class Product {
 
 // const p = new Product('Samsung',2000,'1jpg','iyi telefon');
 // p.saveProduct();
+ */
+const Sequelize = require('sequelize'); 
+const sequelize = require('../utility/database');
+
+const Product = sequelize.define('product',{
+    id:{
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allownull: false,
+        primaryKey: true
+    },
+    name:Sequelize.STRING,
+    price: {
+        type: Sequelize.DOUBLE,
+        allownull: false
+    },
+    imageUrl: {
+        type: Sequelize.STRING,
+        allownull: false
+    },
+    description: {
+        type: Sequelize.STRING,
+        allownull: true
+    }
+
+});
+
+
+module.exports = Product;

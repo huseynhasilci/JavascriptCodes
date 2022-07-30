@@ -1,4 +1,4 @@
-const connection = require('../utility/database');
+/* const connection = require('../utility/database');
 
 module.exports = class Category{
 
@@ -26,4 +26,25 @@ module.exports = class Category{
     static deleteById(id){
         return connection.execute('DELETE FROM categories WHERE categories.id=?',[id]);
     } 
-}
+} */
+
+const Sequelize = require('sequelize'); 
+const sequelize = require('../utility/database');
+
+const Category = sequelize.define('category',{
+    id:{
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allownull: false,
+        primaryKey: true
+    },
+    name:Sequelize.STRING,
+    description: {
+        type: Sequelize.STRING,
+        allownull: true
+    }
+
+});
+
+
+module.exports = Category;
