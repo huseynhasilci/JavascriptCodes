@@ -126,9 +126,7 @@ exports.postCartItemDelete = (req, res, next) => {
 }
 
 exports.getOrders = (req, res, next) => {
-
-    req.user
-        .getOrders()
+    Order.find({'user.userId':req.user._id})
         .then(orders => {
             res.render('shop/orders', {
                 title: 'Orders',
@@ -167,10 +165,10 @@ exports.postOrder = (req, res, next) => {
             order.save();
         })
         .then(() => {
-            // kart temizleriz
+            return req.user.clearCart();
         })
         .then(() => {
-            res.redirect('/order');
+            res.redirect('/orders');
         })
         .catch(err => {
             console.log(err);
