@@ -1,28 +1,21 @@
 const Product = require('../models/product');
 const Category = require('../models/category');
-
+const Order = require('../models/order');
 exports.getIndex = (req, res, next) => {
 
     Product.find()
         .then(products => {
-            res.render('shop/index', {
-                title: 'Shopping',
-                products: products,
-                path: '/'
-            });
-            // Category.findAll()
-            //     .then(categories => {
-            //         res.render('shop/index', {
-            //             title: 'Shopping',
-            //             products: products,
-            //             path: '/',
-            //             categories:categories
-            //         });
-            //     })
-            //     .catch(err => {
-            //         console.log(err);
-            //     })
-            
+            return products;
+        }).then(products => {
+            Category.find()
+                .then(categories => {
+                    res.render('shop/index', {
+                        title: 'Shopping',
+                        products: products,
+                        path: '/',
+                        categories: categories
+                    });
+                })
         })
         .catch((err) => {
             console.log(err);
@@ -30,54 +23,20 @@ exports.getIndex = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-
-    //eq(equal)
-    //neq(not equal)
-    // gt (greater then)
-    // gte (greater then or equal)
-    // lt (less then)
-    // lte (less then or equal)
-    // in
-    // nin (not in)
-
     Product
         .find()
-        //.find({price: {$eq: 200}}),
-        //.find({price: {$ne: 200}})
-        //.find({price: {$gt: 200}})
-        //.find({price: {$gte: 200}})
-        //.find({price: {$lt: 200}})
-        //.find({price: {$lte: 200}})
-        //.find({price: {$in: [1000,2000,3000]}})
-        //.find({price: {$gte:1000, $lte:2000}})
-        //.or([{price: {$gt: 200},name:'Samsung S6'}])
-
-        // starts with
-        // .find({name: /^Samsung/})
-        // ends with
-        // .find({name: /Samsung$/})
-        // contaions
-        // .find({name: /.*Samsung.*/})
-
         .then(products => {
-            res.render('shop/products', {
-                title: 'Products',
-                products: products,
-                path: '/'
-            });
-            // Category.findAll()
-            //     .then(categories => {
-            //         res.render('shop/products', {
-            //             title: 'Products',
-            //             products: products,
-            //             path: '/',
-            //             categories:categories
-            //         });
-            //     })
-            //     .catch(err => {
-            //         console.log(err);
-            //     });
-            
+            return products;
+        }).then(products => {
+            Category.find()
+                .then(categories => {
+                    res.render('shop/products', {
+                        title: 'Products',
+                        products: products,
+                        path: '/',
+                        categories: categories
+                    });
+                })
         })
         .catch((err) => {
             console.log(err);
@@ -88,11 +47,12 @@ exports.getProductsByCategoryId = (req, res, next) => {
     const categoryid = req.params.categoryid;
     const model = [];
 
-    Category.findAll()
+    Category.find()
         .then(categories => {
             model.categories = categories;
-            return Product.findByCategoryId(categoryid);
-            
+            return Product.find({
+                categories: categoryid
+            });
         })
         .then(products => {
             res.render('shop/products', {
@@ -112,7 +72,7 @@ exports.getProduct = (req, res, next) => {
 
     Product
         .findById(req.params.productid)
-        //.findOne({name:'Samsung S6', price: 2000})
+        //.findOne({ name : 'Samsung S6', price: 2000 })
         .then(product => {
             res.render('shop/product-detail', {
                 title: product.name,
@@ -128,16 +88,19 @@ exports.getProduct = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
     req.user
-        .getCart()
-        .then(products => {
+        .populate('cart.items.productId')
+        .execPopulate()
+        .then(user => {
             res.render('shop/cart', {
                 title: 'Cart',
                 path: '/cart',
-                products: products
+                products: user.cart.items
             });
-        }).catch(err => {
+        })
+        .catch(err => {
             console.log(err);
         });
+        
 }
 
 exports.postCart = (req, res, next) => {
@@ -147,48 +110,72 @@ exports.postCart = (req, res, next) => {
         .then(product => {
             return req.user.addToCart(product);
         })
-        .then(()=>{
+        .then(() => {
             res.redirect('/cart');
         })
-        .catch(err=>{
-            console.log(err);
-        });
+        .catch(err => console.log(err));
 }
 
 exports.postCartItemDelete = (req, res, next) => {
     const productid = req.body.productid;
-
     req.user
         .deleteCartItem(productid)
-        .then(result => {
+        .then(() => {
             res.redirect('/cart');
         });
 }
 
 exports.getOrders = (req, res, next) => {
+
     req.user
         .getOrders()
         .then(orders => {
-            res.render('shop/orders',{
+            res.render('shop/orders', {
                 title: 'Orders',
                 path: '/orders',
-                orders:orders
+                orders: orders
             });
+
         })
-        .catch(err=> {
-            console.log(err);
-        })
+        .catch(err => console.log(err));
 }
 
 exports.postOrder = (req, res, next) => {
+    
     req.user
-        .addOrder()
-        .then(()=>{
-            res.redirect('cart');
+        .populate('cart.items.productId')
+        .execPopulate()
+        .then(user => {
+            const order = new Order({
+                user:{
+                    userId:req.user._id,
+                    name: req.user.name,
+                    email: req.user.email
+                },
+                items: user.cart.items.map(p => {
+                    return {
+                        product: {
+                            _id: p.productId._id,
+                            name: p.productId.name,
+                            price: p.productId.price,
+                            imageUrl: p.productId.imageUrl
+                        },
+                        quantity:p.quantity
+                    };
+                })
+            })
+            order.save();
         })
-        .catch(err =>{
+        .then(() => {
+            // kart temizleriz
+        })
+        .then(() => {
+            res.redirect('/order');
+        })
+        .catch(err => {
             console.log(err);
-        })
+        });
+    
 }
 
 
