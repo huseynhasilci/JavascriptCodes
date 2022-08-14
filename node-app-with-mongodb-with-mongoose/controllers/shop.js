@@ -2,7 +2,8 @@ const Product = require('../models/product');
 const Category = require('../models/category');
 const Order = require('../models/order');
 exports.getIndex = (req, res, next) => {
-
+    // console.log(req.cookies.isAuthenticated);
+    console.log(req.session.isAuthenticated);
     Product.find()
         .then(products => {
             return products;
@@ -13,7 +14,8 @@ exports.getIndex = (req, res, next) => {
                         title: 'Shopping',
                         products: products,
                         path: '/',
-                        categories: categories
+                        categories: categories,
+                        isAuthenticated: req.session.isAuthenticated 
                     });
                 })
         })
