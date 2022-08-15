@@ -4,7 +4,8 @@ exports.getLogin = (req,res,next) => {
     res.render('account/login',{
         path:'/login',
         title: 'Login',
-        isAuthenticated: req.session.isAuthenticated 
+        isAuthenticated: req.session.isAuthenticated,
+        
     });
 }
 
@@ -12,15 +13,33 @@ exports.postLogin = (req,res,next) => {
 
     const email = req.body.email;
     const password = req.body.password;
-    if((email == 'email@gmail.com') && (password =='1234')){
-        // res.cookie('isAuthenticated',true);
-        req.session.isAuthenticated = true;
-        res.redirect('/');
-    }
-    else{
-        res.redirect('/login');
-    }
-
+    
+    User.findOne({email:email})
+        .then(user => {
+            if(!user){
+                return res.redirect('/login');
+            }
+            bcrypt.compare(password,user.password)
+                .then(isSuccess => {
+                    if(isSuccess){
+                        // login
+                        req.session.user = user;
+                        req.session.isAuthenticated = true;
+                        return req.session.save(function(err){
+                            var url = req.session.redirectTo || '/';
+                            delete req.session.redirectTo;
+                            res.redirect(url);
+                        });
+                    }
+                    res.redirect('/login');
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        })
+        .catch(err => {
+            console.log(err);
+        })
     
 }
 
@@ -76,3 +95,10 @@ exports.postResetPassword = (req,res,next) => {
     res.redirect('/login');
 }
 
+exports.getLogout = (req,res,next) => {
+    req.session.destroy(err => {
+        console.log(err);
+        res.redirect('/');
+    });
+    
+}

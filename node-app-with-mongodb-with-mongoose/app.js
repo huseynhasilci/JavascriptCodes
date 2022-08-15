@@ -15,7 +15,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const mongodbStore = require('connect-mongodb-session')(session);
-
+const csurf = require('csurf');
 const errorController = require('./controllers/errors');
 
 
@@ -38,7 +38,12 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req,res,next) => {
-    User.findOne({name:'sadikturan'})
+
+    if(!req.session.user){
+        return next();
+    }
+
+    User.findById(req.session.user._id)
         .then(user => {
             req.user = user;
             
@@ -48,7 +53,7 @@ app.use((req,res,next) => {
             console.log(err);
         });
 });
-
+app.use(csurf());
 // routes
 app.use('/admin', adminRoutes);
 app.use(userRoutes);

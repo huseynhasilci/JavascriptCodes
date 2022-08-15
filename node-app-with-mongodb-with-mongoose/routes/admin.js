@@ -2,29 +2,30 @@ const express = require('express');
 const router = express.Router();
 
 const adminController = require('../controllers/admin');
+const isAuthenticated = require('../middleware/authentication');
+const csrf = require('../middleware/csrf');
+router.get('/products', isAuthenticated,adminController.getProducts);
 
-router.get('/products', adminController.getProducts);
+router.get('/add-product', csrf, isAuthenticated, adminController.getAddProduct);
 
-router.get('/add-product', adminController.getAddProduct);
+router.post('/add-product', csrf,isAuthenticated, adminController.postAddProduct);
 
-router.post('/add-product', adminController.postAddProduct);
+router.get('/products/:productid', csrf, isAuthenticated, adminController.getEditProduct);
 
-router.get('/products/:productid', adminController.getEditProduct);
+router.post('/products', csrf,isAuthenticated, adminController.postEditProduct);
 
-router.post('/products', adminController.postEditProduct);
+router.post('/delete-product', csrf,isAuthenticated, adminController.postDeleteProduct);
 
-router.post('/delete-product', adminController.postDeleteProduct);
+router.get('/add-category', csrf, isAuthenticated, adminController.getAddCategory);
 
-router.get('/add-category', adminController.getAddCategory);
+router.post('/add-category', csrf,isAuthenticated, adminController.postAddCategory);
 
-router.post('/add-category', adminController.postAddCategory);
+router.get('/categories', csrf, isAuthenticated, adminController.getCategories);
 
-router.get('/categories', adminController.getCategories);
+router.get('/categories/:categoryid', csrf,isAuthenticated, adminController.getEditCategory);
 
-router.get('/categories/:categoryid', adminController.getEditCategory);
+router.post('/categories', csrf,isAuthenticated, adminController.postEditCategory);
 
-router.post('/categories', adminController.postEditCategory);
-
-router.post('/delete-category', adminController.postDeleteCategory);
+router.post('/delete-category', csrf,isAuthenticated, adminController.postDeleteCategory);
 
 module.exports = router;

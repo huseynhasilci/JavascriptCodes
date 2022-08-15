@@ -36,7 +36,8 @@ exports.getProducts = (req, res, next) => {
                         title: 'Products',
                         products: products,
                         path: '/',
-                        categories: categories
+                        categories: categories,
+                        isAuthenticated: req.session.isAuthenticated
                     });
                 })
         })
@@ -62,7 +63,8 @@ exports.getProductsByCategoryId = (req, res, next) => {
                 products: products,
                 categories: model.categories,
                 selectedCategory: categoryid,
-                path: '/products'
+                path: '/products',
+                isAuthenticated: req.session.isAuthenticated
             });
         })
         .catch((err) => {
@@ -79,7 +81,8 @@ exports.getProduct = (req, res, next) => {
             res.render('shop/product-detail', {
                 title: product.name,
                 product: product,
-                path: '/products'
+                path: '/products',
+                isAuthenticated: req.session.isAuthenticated
             });
         })
         .catch((err) => {
@@ -96,7 +99,8 @@ exports.getCart = (req, res, next) => {
             res.render('shop/cart', {
                 title: 'Cart',
                 path: '/cart',
-                products: user.cart.items
+                products: user.cart.items,
+                isAuthenticated: req.session.isAuthenticated
             });
         })
         .catch(err => {
@@ -133,7 +137,8 @@ exports.getOrders = (req, res, next) => {
             res.render('shop/orders', {
                 title: 'Orders',
                 path: '/orders',
-                orders: orders
+                orders: orders,
+                isAuthenticated: req.session.isAuthenticated
             });
 
         })
