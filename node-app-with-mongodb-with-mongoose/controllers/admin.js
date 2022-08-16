@@ -3,17 +3,15 @@ const Category = require('../models/category');
 
 exports.getProducts = (req, res, next) => {
     Product
-        .find()
+        .find({ userId: req.user._id })
         .populate('userId', 'name -_id')
         .select('name price imageUrl userId')
         .then(products => {
-            console.log(products);
             res.render('admin/products', {
                 title: 'Admin Products',
                 products: products,
                 path: '/admin/products',
-                action: req.query.action,
-                isAuthenticated: req.session.isAuthenticated
+                action: req.query.action
             });
         })
         .catch((err) => {
@@ -24,8 +22,7 @@ exports.getProducts = (req, res, next) => {
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/add-product', {
         title: 'New Product',
-        path: '/admin/add-product',
-        isAuthenticated: req.session.isAuthenticated
+        path: '/admin/add-product'
     });
 }
 
@@ -53,16 +50,17 @@ exports.postAddProduct = (req, res, next) => {
         .catch(err => {
             console.log(err);
         });
-
-
 }
 
 exports.getEditProduct = (req, res, next) => {
 
-    Product.findById(req.params.productid)
+    Product.findOne(
+        { _id: req.params.productid, userId: req.user._id })
         //.populate('categories', 'name -_id')
         .then(product => {
-            console.log(product);
+            if (!product) {
+                return res.redirect('/');
+            }
             return product;
         })
         .then(product => {
@@ -107,7 +105,7 @@ exports.postEditProduct = (req, res, next) => {
     const description = req.body.description;
     const ids = req.body.categoryids;
 
-    Product.update({ _id: id }, {
+    Product.update({ _id: id, userId: req.user._id }, {
         $set: {
             name: name,
             price: price,
@@ -126,9 +124,11 @@ exports.postDeleteProduct = (req, res, next) => {
 
     const id = req.body.productid;
 
-    Product.findByIdAndRemove(id)
-        .then(() => {
-            console.log('product has been deleted.');
+    Product.deleteOne({ _id: id, userId: req.user._id })
+        .then((result) => {
+            if (result.deletedCount === 0) {
+                return res.redirect('/');
+            }
             res.redirect('/admin/products?action=delete');
         })
         .catch(err => {
@@ -140,8 +140,7 @@ exports.postDeleteProduct = (req, res, next) => {
 exports.getAddCategory = (req, res, next) => {
     res.render('admin/add-category', {
         title: 'New Category',
-        path: '/admin/add-category',
-        isAuthenticated: req.session.isAuthenticated
+        path: '/admin/add-category'
     });
 }
 
@@ -171,8 +170,7 @@ exports.getCategories = (req, res, next) => {
                 title: 'Categories',
                 path: '/admin/categories',
                 categories: categories,
-                action: req.query.action,
-                isAuthenticated: req.session.isAuthenticated
+                action: req.query.action
             });
         }).catch(err => console.log(err));
 }
@@ -184,8 +182,7 @@ exports.getEditCategory = (req, res, next) => {
             res.render('admin/edit-category', {
                 title: 'Edit Category',
                 path: '/admin/categories',
-                category: category,
-                isAuthenticated: req.session.isAuthenticated
+                category: category
             })
         })
         .catch(err => console.log(err));

@@ -3,13 +3,13 @@ extends ../layouts/main-layout.pug
 block content 
 
     if (action !== 'undefined' && action === 'create')
-        div.alert.alert-success The categories has been created.
+        div.alert.alert-success The category has been created.
 
     if (action !== 'undefined' && action === 'delete')
-        div.alert.alert-danger The categories has been deleted.
+        div.alert.alert-danger The category has been deleted.
 
     if (action !== 'undefined' && action === 'edit')
-        div.alert.alert-warning The categories has been updated.
+        div.alert.alert-warning The category has been updated.
     
     if categories.length > 0
         table.table.table-bordered
@@ -20,7 +20,7 @@ block content
                     th(style="width:133px;")
             tbody
                 each category in categories
-                    tr
+                    tr                     
                         td #{category.name}
                         td #{category.description}
                         td 
@@ -30,4 +30,4 @@ block content
                                 input(type='hidden' name='categoryid' value=`${category._id}`)
                                 button(type='submit').btn.btn-danger.btn-sm Delete
     else
-        h1 No Category                        
+        h1 No Categories                        

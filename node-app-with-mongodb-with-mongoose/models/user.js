@@ -10,9 +10,15 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    password:{
+    password: {
         type: String,
         required: true
+    },
+    resetToken: String,
+    resetTokenExpiration: Date,
+    isAdmin: {
+        type: Boolean,
+        default: false
     },
     cart: {
         items: [
@@ -96,8 +102,8 @@ userSchema.methods.deleteCartItem = function (productid) {
     return this.save();
 }
 
-userSchema.methods.clearCart = function(){
-    this.cart = {items:[]};
+userSchema.methods.clearCart = function () {
+    this.cart = { items: [] };
     return this.save();
 }
 

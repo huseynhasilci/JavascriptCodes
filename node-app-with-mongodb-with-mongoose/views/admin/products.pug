@@ -14,7 +14,7 @@ block content
                     th(style="width:100px;") Image
                     th Product Name
                     th(style="width:150px;") Price
-                    th 
+                    th
                     th(style="width:133px;")
             tbody
                 each product in products
@@ -28,6 +28,7 @@ block content
                             a.btn.btn-primary.btn-sm.mr-2(href=`/admin/products/${product._id}`) Edit
 
                             form(action='/admin/delete-product' method='POST')
+                                input(type="hidden" name="_csrf" value=`${csrfToken}`)
                                 input(type='hidden' name='productid' value=`${product._id}`)
                                 button(type='submit').btn.btn-danger.btn-sm Delete
     else

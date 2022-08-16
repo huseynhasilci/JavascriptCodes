@@ -1,9 +1,12 @@
 const Product = require('../models/product');
 const Category = require('../models/category');
 const Order = require('../models/order');
+
 exports.getIndex = (req, res, next) => {
+    // console.log(req.isAuthenticated);
     // console.log(req.cookies.isAuthenticated);
     console.log(req.session.isAuthenticated);
+
     Product.find()
         .then(products => {
             return products;
@@ -14,8 +17,7 @@ exports.getIndex = (req, res, next) => {
                         title: 'Shopping',
                         products: products,
                         path: '/',
-                        categories: categories,
-                        isAuthenticated: req.session.isAuthenticated 
+                        categories: categories
                     });
                 })
         })
@@ -36,8 +38,7 @@ exports.getProducts = (req, res, next) => {
                         title: 'Products',
                         products: products,
                         path: '/',
-                        categories: categories,
-                        isAuthenticated: req.session.isAuthenticated
+                        categories: categories
                     });
                 })
         })
@@ -63,8 +64,7 @@ exports.getProductsByCategoryId = (req, res, next) => {
                 products: products,
                 categories: model.categories,
                 selectedCategory: categoryid,
-                path: '/products',
-                isAuthenticated: req.session.isAuthenticated
+                path: '/products'
             });
         })
         .catch((err) => {
@@ -81,8 +81,7 @@ exports.getProduct = (req, res, next) => {
             res.render('shop/product-detail', {
                 title: product.name,
                 product: product,
-                path: '/products',
-                isAuthenticated: req.session.isAuthenticated
+                path: '/products'
             });
         })
         .catch((err) => {
@@ -99,14 +98,11 @@ exports.getCart = (req, res, next) => {
             res.render('shop/cart', {
                 title: 'Cart',
                 path: '/cart',
-                products: user.cart.items,
-                isAuthenticated: req.session.isAuthenticated
+                products: user.cart.items
             });
-        })
-        .catch(err => {
+        }).catch(err => {
             console.log(err);
         });
-        
 }
 
 exports.postCart = (req, res, next) => {
@@ -132,13 +128,15 @@ exports.postCartItemDelete = (req, res, next) => {
 }
 
 exports.getOrders = (req, res, next) => {
-    Order.find({'user.userId':req.user._id})
+
+    Order
+        .find({ 'user.userId': req.user._id })
         .then(orders => {
+            console.log(orders);
             res.render('shop/orders', {
                 title: 'Orders',
                 path: '/orders',
-                orders: orders,
-                isAuthenticated: req.session.isAuthenticated
+                orders: orders
             });
 
         })
@@ -146,14 +144,14 @@ exports.getOrders = (req, res, next) => {
 }
 
 exports.postOrder = (req, res, next) => {
-    
+
     req.user
         .populate('cart.items.productId')
         .execPopulate()
         .then(user => {
             const order = new Order({
-                user:{
-                    userId:req.user._id,
+                user: {
+                    userId: req.user._id,
                     name: req.user.name,
                     email: req.user.email
                 },
@@ -165,11 +163,11 @@ exports.postOrder = (req, res, next) => {
                             price: p.productId.price,
                             imageUrl: p.productId.imageUrl
                         },
-                        quantity:p.quantity
+                        quantity: p.quantity
                     };
                 })
-            })
-            order.save();
+            });
+            return order.save();
         })
         .then(() => {
             return req.user.clearCart();
@@ -180,7 +178,6 @@ exports.postOrder = (req, res, next) => {
         .catch(err => {
             console.log(err);
         });
-    
 }
 
 

@@ -3,72 +3,68 @@ const app = express();
 
 const bodyParser = require('body-parser');
 const path = require('path');
+const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const mongoDbStore = require('connect-mongodb-session')(session);
+const csurf = require('csurf');
 
 app.set('view engine', 'pug');
 app.set('views', './views');
 
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/shop');
-const accountRouter = require('./routes/account');
+const accountRoutes = require('./routes/account');
 
-const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
-const session = require('express-session');
-const mongodbStore = require('connect-mongodb-session')(session);
-const csurf = require('csurf');
 const errorController = require('./controllers/errors');
 
-
 const User = require('./models/user');
-var store = new mongodbStore({
-    uri: 'mongodb+srv://huseyinhasilci:A33d691e.@cluster0.kxfwncp.mongodb.net/node-app',
+const ConnectionString = 'mongodb+srv://sadikturan:WbQ5vdSRiQIfcmdp@cluster0-4nd5p.mongodb.net/node-app?retryWrites=true';
+
+var store = new mongoDbStore({
+    uri: ConnectionString,
     collection: 'mySessions'
 });
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
-    secret: 'keybord cat',
+    secret: 'keyboard cat',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge:36000
+        maxAge: 3600000
     },
-    store:store
+    store: store
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use((req,res,next) => {
+app.use((req, res, next) => {
 
-    if(!req.session.user){
+    if (!req.session.user) {
         return next();
     }
 
     User.findById(req.session.user._id)
         .then(user => {
             req.user = user;
-            
             next();
         })
-        .catch(err => {
-            console.log(err);
-        });
-});
+        .catch(err => { console.log(err) });
+})
 app.use(csurf());
-// routes
+
 app.use('/admin', adminRoutes);
 app.use(userRoutes);
-app.use(accountRouter);
+app.use(accountRoutes);
 
 app.use(errorController.get404Page);
 
-
-
-mongoose.connect('mongodb+srv://huseyinhasilci:A33d691e.@cluster0.kxfwncp.mongodb.net/node-app')
+mongoose.connect(ConnectionString)
     .then(() => {
-        console.log('Connected to mongodb');
+        console.log('connected to mongodb');
         app.listen(3000);
-
     })
-    .catch(err=>{
+    .catch(err => {
         console.log(err);
-    });
+    })

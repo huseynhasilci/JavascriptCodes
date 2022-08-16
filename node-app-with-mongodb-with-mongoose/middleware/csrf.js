@@ -1,5 +1,5 @@
-module.exports = (req,res,next) => {
+module.exports = (req, res, next) => {
     res.locals.csrfToken = req.csrfToken();
-    res.locals.isAuthentication =  req.session.isAuthenticated;
+    res.locals.isAuthenticated = req.session.isAuthenticated;
     next();
 }

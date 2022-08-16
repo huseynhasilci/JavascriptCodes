@@ -17,6 +17,8 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-primary.fixed-top
                 li.nav-item
                     a(href="/orders", class=(path === '/orders'?'nav-link active':'nav-link')) Orders       
                         
+            if isAdmin
+
                 li.nav-item
                     a(href="/admin/add-product", class=(path==='/admin/add-product'?'nav-link active':'nav-link')) Add Product 
 
@@ -28,6 +30,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-primary.fixed-top
 
                 li.nav-item
                     a(href="/admin/categories", class=(path==='/admin/categories'?'nav-link active':'nav-link')) Categories
+        
 
         ul.navbar-nav.ml-auto
             if isAuthenticated
@@ -35,7 +38,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-primary.fixed-top
                     a.nav-link(href="/logout") Logout
             else 
                 li.nav-item
-                a.nav-link(href="/login") Login
-                    
+                    a.nav-link(href="/login") Login
+                        
                 li.nav-item
-                    a.nav-link(href="/register") Register    
+                    a.nav-link(href="/register") Register 
