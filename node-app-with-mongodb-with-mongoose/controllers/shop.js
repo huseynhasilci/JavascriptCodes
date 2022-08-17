@@ -3,10 +3,6 @@ const Category = require('../models/category');
 const Order = require('../models/order');
 
 exports.getIndex = (req, res, next) => {
-    // console.log(req.isAuthenticated);
-    // console.log(req.cookies.isAuthenticated);
-    console.log(req.session.isAuthenticated);
-
     Product.find()
         .then(products => {
             return products;
@@ -22,7 +18,7 @@ exports.getIndex = (req, res, next) => {
                 })
         })
         .catch((err) => {
-            console.log(err);
+            next(err);
         });
 }
 
@@ -43,7 +39,7 @@ exports.getProducts = (req, res, next) => {
                 })
         })
         .catch((err) => {
-            console.log(err);
+            next(err);
         });
 }
 
@@ -68,7 +64,7 @@ exports.getProductsByCategoryId = (req, res, next) => {
             });
         })
         .catch((err) => {
-            console.log(err);
+            next(err);
         })
 }
 
@@ -85,7 +81,7 @@ exports.getProduct = (req, res, next) => {
             });
         })
         .catch((err) => {
-            console.log(err);
+            next(err);
         });
 }
 
@@ -101,7 +97,7 @@ exports.getCart = (req, res, next) => {
                 products: user.cart.items
             });
         }).catch(err => {
-            console.log(err);
+            next(err);
         });
 }
 
@@ -115,7 +111,7 @@ exports.postCart = (req, res, next) => {
         .then(() => {
             res.redirect('/cart');
         })
-        .catch(err => console.log(err));
+        .catch(err => next(err));
 }
 
 exports.postCartItemDelete = (req, res, next) => {
@@ -140,7 +136,7 @@ exports.getOrders = (req, res, next) => {
             });
 
         })
-        .catch(err => console.log(err));
+        .catch(err => next(err));
 }
 
 exports.postOrder = (req, res, next) => {
@@ -176,7 +172,7 @@ exports.postOrder = (req, res, next) => {
             res.redirect('/orders');
         })
         .catch(err => {
-            console.log(err);
+            next(err);
         });
 }
 

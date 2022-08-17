@@ -58,7 +58,12 @@ app.use('/admin', adminRoutes);
 app.use(userRoutes);
 app.use(accountRoutes);
 
+app.use('/500', errorController.get500Page);
 app.use(errorController.get404Page);
+app.use((error, req, res, next) => {
+
+    res.status(500).render('error/500', { title: 'Error' });
+});
 
 mongoose.connect(ConnectionString)
     .then(() => {
